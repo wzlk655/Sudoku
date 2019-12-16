@@ -78,6 +78,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -117,12 +120,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Sudokusolver.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="permutation.cpp" />
     <ClCompile Include="Sudoku.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
+    <ClInclude Include="SudokuSolver.h" />
     <ClInclude Include="permutation.h" />
     <ClInclude Include="Sudoku.h" />
   </ItemGroup>

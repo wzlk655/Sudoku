@@ -7,6 +7,20 @@ Block::Block(int _seed):seed(_seed)
 	permutation(nums, values, 9, seed);
 }
 
+Block::Block(int _seed, int _id):seed(_seed)
+{
+	_id %= 9;
+	int n_values[8];
+	int i = 0;
+	for (; values[i] != _id; ++i);
+	for (int j = 1; j <= 8; ++j)
+	{
+		n_values[j - 1] = values[(i + j) % 9];
+	}
+	nums[8] = _id;
+	permutation(nums, n_values, 8, seed);
+}
+
 Block::Block(Block & block)
 {
 	seed = block.seed;
