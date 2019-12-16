@@ -18,16 +18,27 @@ Block::Block(int _seed, int _id):seed(_seed)
 		n_values[j - 1] = values[(i + j) % 9];
 	}
 	nums[8] = _id;
-	permutation(nums, n_values, 8, seed);
+	int tmp_seed = seed;
+	permutation(nums, n_values, 8, tmp_seed);
 }
 
-Block::Block(Block & block)
+Block::Block(const Block & block)
 {
 	seed = block.seed;
 	for (int i = 0; i < 9; ++i)
 	{
 		nums[i] = block.nums[i];
 	}
+}
+
+Block Block::operator=(const Block & block)
+{
+	seed = block.seed;
+	for (int i = 0; i < 9; ++i)
+	{
+		nums[i] = block.nums[i];
+	}
+	return Block(block);
 }
 
 void Block::swapColumns(int i, int j)
