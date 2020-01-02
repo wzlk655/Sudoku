@@ -42,9 +42,8 @@ Sudoku Sudoku::operator=(const Sudoku & s)
 	return Sudoku(s);
 }
 
-void Sudoku::toFile(std::string fname)
+void Sudoku::toFile(FILE* f)
 {
-	FILE *f = fopen(fname.data(), "a");
 	for (int i = 0; i < 9; ++i)
 	{
 		int row = i / 3, line = i % 3;
@@ -55,14 +54,11 @@ void Sudoku::toFile(std::string fname)
 		else
 			fprintf(f, "%d %d %d", blocks[row * 3 + 2].nums[line * 3], blocks[row * 3 + 2].nums[line * 3 + 1], blocks[row * 3 + 2].nums[line * 3 + 2]);
 	}
-	fclose(f);
 }
 
-void Sudoku::appendLine(std::string fname)
+void Sudoku::appendLine(FILE *f)
 {
-	FILE *f = fopen(fname.data(), "a");
 	fprintf(f, "\n\n");
-	fclose(f);
 }
 
 Sudoku Sudoku::swapRows(int x, int i, int j)

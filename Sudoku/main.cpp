@@ -17,7 +17,7 @@ void paramError();
 
 int main(int argc, char* argv[])
 {
-	handleCreate(string("1000"));
+	//handleCreate(string("1000"));
 	//判断参数是否合法
 	if (argc != 3)
 	{
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
 	if (string(argv[1]) == "-c")
 	{
-		handleCreate(string(argv[1]));
+		handleCreate(string(argv[2]));
 	}
 	else if (string(argv[1]) == "-s")
 	{
@@ -42,8 +42,10 @@ void handleCreate(string amount)
 {
 	int num;
 	stringstream ss_num(amount);
+	FILE* f = fopen("sudoku.txt", "w");
 	if (ss_num >> num)
 	{
+		//TODO:将种子更新变为定向，避免两次随机结果一样
 		int seed = rand() % SEED_MAX + 1;
 		while (true)
 		{
@@ -65,14 +67,14 @@ void handleCreate(string amount)
 									Sudoku n_sudoku(sudoku.changeState(seeds));
 									if (!(--num))//生成指定数量
 									{
-										n_sudoku.toFile("test.txt");
+										n_sudoku.toFile(f);
 										flag = true;
 										break;
 									}
 									else
 									{
-										n_sudoku.toFile("test.txt");
-										n_sudoku.appendLine("test.txt");
+										n_sudoku.toFile(f);
+										n_sudoku.appendLine(f);
 									}
 									if (flag)
 										break;
@@ -98,6 +100,7 @@ void handleCreate(string amount)
 	}
 	else//输入不是数字
 		paramError();
+	fclose(f);
 	return;
 }
 
