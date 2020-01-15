@@ -1,6 +1,7 @@
 #include<iostream>
 #include<cstdio>
 #include<cstdlib>
+#include<ctime>
 #include<string>
 #include<sstream>
 #include "permutation.h"
@@ -14,6 +15,7 @@ const int ID = 3;
 void handleCreate(string);
 void handleSolve(string);
 void paramError();
+void fileNotFound();
 
 int main(int argc, char* argv[])
 {
@@ -45,24 +47,29 @@ void handleCreate(string amount)
 	FILE* f = fopen("sudoku.txt", "w");
 	if (ss_num >> num)
 	{
+		if (!(1 <= num&&num <= 100000))
+		{
+			printf("请输入1-1000000的数字！\n");
+		}
 		//TODO:将种子更新变为定向，避免两次随机结果一样
+		srand(int(time(NULL)));
 		int seed = rand() % SEED_MAX + 1;
 		while (true)
 		{
 			Sudoku sudoku(seed, ID);
-			int seeds[6] = { 0 };
-			bool flag = false;
-			for (seeds[0] = 0; seeds[0] < 2; ++seeds[0])
+			int seeds[6] = { 0 };//控制一个基本数独的变换
+			bool flag = false;//是否达到数量
+			for (seeds[0] = 0; seeds[0] < 2; ++seeds[0])//变换23行
 			{
-				for (seeds[1] = 0; seeds[1] < 6; ++seeds[1])
+				for (seeds[1] = 0; seeds[1] < 6; ++seeds[1])//变换456行
 				{
-					for (seeds[2] = 0; seeds[2] < 6; ++seeds[2])
+					for (seeds[2] = 0; seeds[2] < 6; ++seeds[2])//变换789行
 					{
-						for (seeds[3] = 0; seeds[3] < 2; ++seeds[3])
+						for (seeds[3] = 0; seeds[3] < 2; ++seeds[3])//变换23列
 						{
-							for (seeds[4] = 0; seeds[4] < 6; ++seeds[4])
+							for (seeds[4] = 0; seeds[4] < 6; ++seeds[4])//变换456列
 							{
-								for (seeds[5] = 0; seeds[5] < 6; ++seeds[5])
+								for (seeds[5] = 0; seeds[5] < 6; ++seeds[5])//变换789列
 								{
 									Sudoku n_sudoku(sudoku.changeState(seeds));
 									if (!(--num))//生成指定数量
@@ -110,15 +117,18 @@ void handleSolve(string filename)
 	int prob[81];
 	if (fp = fopen(filename.data(), "r"))
 	{
+		int tmp;
 		for (int i = 0; i < 81; ++i)
-			fscanf(fp, "%d", &prob[i]);
+			tmp=fscanf(fp, "%d", &prob[i]);
 		SudokuSolver solver(prob);
-		solver.solve();
-		solver.print();
+		if (solver.solve())
+			solver.print();
+		else
+			printf("该数独无法求解！\n");
 	}
 	else
 	{
-
+		fileNotFound();
 	}
 	return;
 }

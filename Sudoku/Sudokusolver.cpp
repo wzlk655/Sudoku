@@ -13,6 +13,8 @@ int SudokuSolver::solve(std::string method)
 		int st = _find_next_empty(sudoku, 81);
 		return _backtrackSolve(st);
 	}
+	else
+		return 0;
 }
 
 void SudokuSolver::print()
