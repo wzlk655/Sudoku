@@ -7,6 +7,8 @@ public:
 	SudokuSolver(int sudoku[]);
 	int solve(std::string method = "backtrack");
 	void print();
+	void toFile(FILE *f);
+	static void appendLine(FILE *f);
 private:
 	int _backtrackSolve(int holder);
 	bool _isLegal(int pos);

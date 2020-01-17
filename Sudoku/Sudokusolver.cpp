@@ -27,6 +27,24 @@ void SudokuSolver::print()
 	}
 }
 
+void SudokuSolver::toFile(FILE* f)
+{
+	for (int i = 0; i < 81; ++i)
+	{
+		if (i % 9 != 8 && i != 80)
+			fprintf(f, "%d ", sudoku[i]);
+		else if (i != 80)
+			fprintf(f, "%d\n", sudoku[i]);
+		else
+			fprintf(f, "%d", sudoku[i]);
+	}
+}
+
+void SudokuSolver::appendLine(FILE *f)
+{
+	fprintf(f, "\n\n");
+}
+
 int SudokuSolver::_backtrackSolve(int holder)
 {
 	if (holder == -1)//所有空格都填上了

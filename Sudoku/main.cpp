@@ -113,18 +113,37 @@ void handleCreate(string amount)
 
 void handleSolve(string filename)
 {
-	FILE *fp;
+	if (filename == "sudoku.txt")
+	{
+		printf("请更换文件名！\n");
+		return;
+	}
+	FILE *fp, *fo;
 	int prob[81];
 	if (fp = fopen(filename.data(), "r"))
 	{
-		int tmp;
-		for (int i = 0; i < 81; ++i)
-			tmp=fscanf(fp, "%d", &prob[i]);
-		SudokuSolver solver(prob);
-		if (solver.solve())
-			solver.print();
-		else
-			printf("该数独无法求解！\n");
+		fo = fopen("sudoku.txt", "w");
+		while (true)
+		{
+			int tmp;
+			for (int i = 0; i < 81; ++i)
+				tmp = fscanf(fp, "%d", &prob[i]);
+			SudokuSolver solver(prob);
+			if (solver.solve())
+			{
+				//solver.print();
+				solver.toFile(fo);
+			}
+			else
+				printf("该数独无法求解！\n");
+			if (feof(fp))
+				break;
+			else
+			{
+				//printf("\n");
+				solver.appendLine(fo);
+			}
+		}
 	}
 	else
 	{

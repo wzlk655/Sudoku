@@ -29,5 +29,14 @@
     <ClCompile Include="unittest1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="unittest2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="unittest3.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="unittest4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
