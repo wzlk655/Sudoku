@@ -113,7 +113,7 @@ void handleCreate(string amount)
 
 void handleSolve(string filename)
 {
-	if (filename == "sudoku.txt")
+	if (filename == "sudoku.txt") //因为输出要用这个文件
 	{
 		printf("请更换文件名！\n");
 		return;

@@ -79,6 +79,42 @@
 #### 排列生成函数permutation
 由于生成数独需要首先生成3\*3的方格，所以需要对方格的9个位置使用1-9不重复地进行填充。等价于寻找到1个1-9数字的排列。由于需求中要求数独不重复，因此必须有能够生成确定的排列的函数。采用递归思想设计函数，流程图如下。
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/2020011017182573.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzOTUyOQ==,size_16,color_FFFFFF,t_70)
+源代码及注释如下：
+
+```cpp
+int permutation(int *x, int *values, int length, int& seed)
+{
+ /*
+ x：生成的排列存放的数组
+ values：排列的所有元素
+ length：x，values中的元素个数
+ seed：排列的种子，范围为1-(length!)，和具体的排列一一对应
+ */
+ if (length == 1) //1个数的排列直接是自身
+ {
+  x[0] = values[0];
+  seed--;  //找到一个排列
+  return seed;  //如果seed==0，表示找到seed对应的排列，搜索终止
+ }
+ int* n_values = new int[length - 1];
+ for (int i = 0; i < length; ++i)  //尝试在第一个位置填上values的某个值
+ {
+  x[0] = values[i];
+  for (int j = 0; j < length - 1; ++j)  //新的values中排除该值
+  {
+   n_values[j] = values[(i + j + 1) % length];
+  }
+  if (!permutation(x + 1, n_values, length - 1, seed))  //在之前基础上对之后的数再生成排列
+  {
+   delete[] n_values;
+   return 0;  //表示已经找到seed对应的排列了，搜索终止
+  }
+ }
+ delete[] n_values;
+ return 1;  //搜索还没有结束
+}
+```
+
 Block类主要成员
 - int nums[9]：含有9个元素的数组
 - int seed：用于生成格子内数字的seed
@@ -93,10 +129,108 @@ Block类主要成员
 - Sudoku swapRows(int x, int i, int j)：交换行的方法
 - Sudoku swapColumns(int y, int i, int j)：交换列方法
 - Sudoku changeState(int* seed)：根据一个6个元素的数组做行列变换生成新的数独的方法
+源代码及注释如下，主要是对seed种的6个元素调用permutation生成对应的排列后做行列变换，难点是如何根据排列来变化行、列使达到对应的顺序：
+流程图如下，但是实现过程中直接枚举seed中元素，没有使用循环，逻辑略有不同：
+![changeState()](https://img-blog.csdnimg.cn/20200119112338780.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzOTUyOQ==,size_16,color_FFFFFF,t_70)
+```cpp
+Sudoku Sudoku::changeState(int* seed)
+{
+ Sudoku new_sudoku(*this);
+ 
+ //六种变换依次进行
+ int seed0 = seed[0]%2;
+ if (seed0)
+  new_sudoku.swapRows(0, 1, 2);
+ int seed3 = seed[3]%2;
+ if (seed3)
+  new_sudoku.swapColumns(0, 1, 2);
+
+ //不能直接用seed[i]，因为会更改值
+ int seed1 = seed[1] % 6 + 1;//6为3阶乘
+ int x1[3] = { 0 }, y1[3] = { 0,1,2 };
+ permutation(x1, y1, 3, seed1);
+ for (int i = 0; i < 3; ++i)
+ {
+  int j = 0;
+  for (; y1[j] != x1[i]; ++j);//查找原来序列中对应该位置的内容在哪里
+  new_sudoku.swapRows(1, i, j);
+  int tmp = y1[j];//交换y中数据，便于后续查找
+  y1[j] = y1[i];
+  y1[i] = tmp;
+ }
+
+ int seed2 = seed[2] % 6 + 1;//不能直接用seed[i]，因为会更改值
+ int x2[3] = { 0 }, y2[3] = { 0,1,2 };
+ permutation(x2, y2, 3, seed2);
+ for (int i = 0; i < 3; ++i)
+ {
+  int j = 0;
+  for (; y2[j] != x2[i]; ++j);//查找原来序列中对应该位置的内容在哪里
+  new_sudoku.swapRows(2, i, j);
+  int tmp = y2[j];//交换y中数据，便于后续查找
+  y2[j] = y2[i];
+  y2[i] = tmp;
+ }
+
+ int seed4 = seed[4] % 6 + 1;//不能直接用seed[i]，因为会更改值
+ int x4[3] = { 0 }, y4[3] = { 0,1,2 };
+ permutation(x4, y4, 3, seed4);
+ for (int i = 0; i < 3; ++i)
+ {
+  int j = 0;
+  for (; y4[j] != x4[i]; ++j);//查找原来序列中对应该位置的内容在哪里
+  new_sudoku.swapColumns(1, i, j);
+  int tmp = y4[j];//交换y中数据，便于后续查找
+  y4[j] = y4[i];
+  y4[i] = tmp;
+ }
+
+ int seed5 = seed[5] % 6 + 1;//不能直接用seed[i]，因为会更改值
+ int x5[3] = { 0 }, y5[3] = { 0,1,2 };
+ permutation(x5, y5, 3, seed5);
+ for (int i = 0; i < 3; ++i)
+ {
+  int j = 0;
+  for (; y5[j] != x5[i]; ++j);//查找原来序列中对应该位置的内容在哪里
+  new_sudoku.swapColumns(2, i, j);
+  int tmp = y5[j];//交换y中数据，便于后续查找
+  y5[j] = y5[i];
+  y5[i] = tmp;
+ }
+ return new_sudoku;
+ }
+```
+
 - void toFile(FILE *f)：输出到文件相关操作
 #### SudokuSolver类的主要成员
 - int sudoku[81]：存储数独内容的数组。
 - int _backtrackSolve(int holder)：输入空格位置的递归求解数独函数。
+流程图如下：
+![_backtrackSolve()](https://img-blog.csdnimg.cn/20200119112225528.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzOTUyOQ==,size_16,color_FFFFFF,t_70)
+源代码及注释如下，核心是递归调用，进入下一层之前预先判断合法性实现剪枝：
+
+```cpp
+int SudokuSolver::_backtrackSolve(int holder)
+{
+ if (holder == -1)//所有空格都填上了
+  return 1;
+ for (int i = 1; i <= 9; ++i)
+ {
+  sudoku[holder] = i;
+  if (this->_isLegal(holder))
+  {
+   int n_holder = _find_next_empty(sudoku, 81);
+   if (_backtrackSolve(n_holder))//找到解了
+    return 1;
+   //否则，该值无解，尝试下一个数字
+  }
+  //否则，该值不合法，尝试下一个解
+ }
+ sudoku[holder] = 0;//还原现场
+ return 0;
+}
+```
+
 - bool _isLegal(int pos)：判断数独是否合法的函数。
 - static int _find_next_empty(int *map, int size)：寻找下一个空格的函数。
 - int solve(std::string method = "backtrack")：求解方法
@@ -104,7 +238,7 @@ Block类主要成员
 #### main.cpp中的函数
 - 若干打印参数错误的函数
 - void handleCreate(string amount)：处理生成数独
-
+源代码及注释如下：
 ```cpp
 void handleCreate(string amount)
 {
@@ -174,7 +308,7 @@ void handleCreate(string amount)
 ```
 
 - handleSolve(string filename)：处理求解数独
-
+源代码及注释如下：
 ```cpp
 void handleSolve(string filename)
 {
@@ -288,7 +422,7 @@ print(len(set(sudoku)))
 可见文件操作（包括标准输入输出）占了大量的时间，去掉printf后，5184个数独在1.7秒完成。性能有较大提升，分析图如下。
 ![解题性能1](https://img-blog.csdnimg.cn/2020011622214987.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzOTUyOQ==,size_16,color_FFFFFF,t_70)
 ### 性能分析总结
-主要是发现文件相关操作，包括标准输入输出耗费资源都非常大，由于之前算法设计的时候已经做了各种优化，所以算法方面暂时没有大动作，从性能分析可以看出，在创建数独的时候更快捷地进行行列交换是目前性能关键，求解数独中判断数独的合法可能是之后比较容易的一个性能提升点，目前使用的是控制结构+位操作实现，未来可以尝试用更高效的统一的位操作来改进。
+主要是发现文件相关操作，包括标准输入输出耗费资源都非常大。改进后主要的性能瓶颈是生成数独时的changeState()，或者说是它调用的交换行列swapRows()和swapColumns()；还有暂时保留的求解数独中文件读取fscanf()，的判断数独合法函数isLegal()以及递归函数_backtrackSolve()。由于之前算法设计的时候这些算法已经做了各种优化，所以算法方面暂时没有大动作，从性能分析可以看出，在创建数独的时候更快捷地进行行列交换是目前性能关键，求解数独中一次性读取和改变判断数独的合法性的逻辑可能是之后比较容易的一个性能提升点，目前使用的是控制结构+位操作实现，未来可以尝试用更高效的统一的位操作来改进。
 ## 代码质量分析
 尝试使用微软的CppCoreCheck工具进行代码质量分析。
 ![添加库](https://img-blog.csdnimg.cn/20200115034751503.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzOTUyOQ==,size_16,color_FFFFFF,t_70)暂时有6个警告需要消除。
