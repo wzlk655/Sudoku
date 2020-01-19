@@ -312,21 +312,43 @@ void handleCreate(string amount)
 ```cpp
 void handleSolve(string filename)
 {
- FILE *fp;
- int prob[81];
- if (fp = fopen(filename.data(), "r"))
- {
-  for (int i = 0; i < 81; ++i)
-   fscanf(fp, "%d", &prob[i]);
-  SudokuSolver solver(prob);
-  solver.solve();
-  solver.print();
- }
- else
- {
-  fileNotFound();
- }
- return;
+	if (filename == "sudoku.txt") //因为输出要用这个文件
+	{
+		printf("请更换文件名！\n");
+		return;
+	}
+	FILE *fp, *fo;
+	int prob[81];
+	if (fp = fopen(filename.data(), "r"))
+	{
+		fo = fopen("sudoku.txt", "w");
+		while (true)
+		{
+			int tmp;
+			for (int i = 0; i < 81; ++i)
+				tmp = fscanf(fp, "%d", &prob[i]);
+			SudokuSolver solver(prob);
+			if (solver.solve())
+			{
+				//solver.print();
+				solver.toFile(fo);
+			}
+			else
+				printf("该数独无法求解！\n");
+			if (feof(fp))
+				break;
+			else
+			{
+				//printf("\n");
+				solver.appendLine(fo);
+			}
+		}
+	}
+	else
+	{
+		fileNotFound();
+	}
+	return;
 }
 ```
 ## 测试
